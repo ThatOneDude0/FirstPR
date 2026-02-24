@@ -1,5 +1,4 @@
 using System.Net;
-using static StudyTask;
 using System.Linq;
 
 namespace SmartTracker
@@ -27,13 +26,13 @@ namespace SmartTracker
                 Array.Resize(ref _tasks, _tasks.Length * 2);
             }
 
-            _tasksp[_count] = task;
+            _tasks[_count] = task;
             _count++;
 
             Console.WriteLine($"Task '{task.Title}' add with ID {task.Id}");
         }
 
-        public void RemoveTask(int id)
+        public bool RemoveTask(int id)
         {
             for(int i = 0; i < _count; i++)
             {
@@ -44,7 +43,7 @@ namespace SmartTracker
                         _tasks[j] = _tasks[i] = null;
                     }
 
-                    _tasks[_count -1] - null;
+                    _tasks[_count -1] = null;
                     _count--;
 
                     Console.WriteLine($"Task with ID {id} delet");
@@ -144,5 +143,93 @@ namespace SmartTracker
                 return null;
             }
         }
+
+
+       //
+        public StudyTask[] GetTasksByPriority(Priority priority)
+        {
+   
+            return _tasks
+                .Take(_count)
+                .Where(t => t.Priority == priority)
+                .ToArray();
+        }
+
+        public StudyTask[] GetTasksForToday()
+        {
+            DateTime today = DateTime.Today;
+            DateTime tomorrow = today.AddDays(1);
+    
+            return _tasks
+                .Take(_count)
+                .Where(t => t.Deadline >= today && t.Deadline < tomorrow)
+                .ToArray();
+        }
+
+        public StudyTask[] GetTasksForWeek()
+        {
+            DateTime today = DateTime.Today;
+            DateTime nextWeek = today.AddDays(7);
+    
+            return _tasks
+                .Take(_count)
+                .Where(t => t.Deadline >= today && t.Deadline <= nextWeek)
+                .OrderBy(t => t.Deadline)
+                .ToArray();
+}
+
+        public StudyTask[] GetMostUrgentTasks(int count)
+        {
+            return _tasks
+                .Take(this._count)
+                .Where(t => t.Status != Status.Cоmpleted)
+                .OrderBy(t => t.Deadline)
+                .ThenByDescending(t => t.Priority)
+                .Take(count)
+                .ToArray();
+}
+
+        public string GetStatisticsBySubject()
+        {
+            var stats = _tasks
+                .Take(this._count)
+                .GroupBy(t => t.Subject)
+                .Select(g => new
+                {
+                    Subject = g.Key,
+                    TotalTasks = g.Count(),
+                    CompletedTasks = g.Count(t => t.Status == Status.Cоmpleted),
+                    CompletionRate = (double)g.Count(t => t.Status == Status.Cоmpleted) / g.Count() * 100
+                })
+                .OrderByDescending(s => s.CompletionRate);
+    
+            string result = "Statistics by subject:\n";
+            foreach (var stat in stats)
+            {
+                result += $"{stat.Subject}: {stat.CompletedTasks}/{stat.TotalTasks} ({stat.CompletionRate:F1}%)\n";
+            }
+            return result;
+        }
+
+        public StudyTask[] SearchTasks(string searchTerm)
+        {
+            Console.WriteLine("dssdfsdfsdfsfdsdfsfdsdfsfsf");
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                 return new StudyTask[0];
+            }
+
+    
+            string lowerSearch = searchTerm.ToLower();
+    
+            return _tasks
+                .Take(_count)
+                .Where(t => 
+                    t.Title.ToLower().Contains(lowerSearch) ||
+                    t.Description.ToLower().Contains(lowerSearch) ||
+                    t.Subject.ToLower().Contains(lowerSearch))
+                .ToArray(); 
+        }
+        //
     }
 }

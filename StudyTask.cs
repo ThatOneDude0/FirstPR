@@ -15,19 +15,25 @@ namespace SmartTracker
     {
         NotStarted,
         InProgress,
-        COmpleted,
+        Cоmpleted,
         Overdue
     }
 
     public class StudyTask
     {
+        internal Status Status;
+
         public int Id {get; set;}
 
         public string Title {get; set;}
 
         public string Subject {get; set;}
 
-        public string Deadline {get; set;}
+        public string Description {get; set;}
+
+        public DateTime Deadline {get; set;}
+
+        public Priority Priority {get; set;}
 
         public int EstimatedHours {get; set;}
 
@@ -52,14 +58,14 @@ namespace SmartTracker
 
         public void MarkAsCompleted(int hoursSpent)
         {
-            Status = Status.COmpleted;
+            Status = Status.Cоmpleted;
             ActualHours = hoursSpent;
             CompletedAt = DateTime.Now;
         }
 
         public bool IsOverdue()
         {
-            return Status != Status.COmpleted && DateTime.Now > Deadline;
+            return Status != Status.Cоmpleted && DateTime.Now > Deadline;
         }
     }
 }
