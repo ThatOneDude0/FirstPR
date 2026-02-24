@@ -65,7 +65,6 @@ namespace SmartTracker
             task.Priority = p == "1" ? Priority.Low : p == "3" ? Priority.High : Priority.Medium;
     
             Console.Write("Planned time (hours): ");
-            // ИСПРАВЛЕНО: используем тернарный оператор с временной переменной
             task.EstimatedHours = int.TryParse(Console.ReadLine(), out int hours) ? hours : 0;
     
             manager.AddTask(task);
